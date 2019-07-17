@@ -5,8 +5,8 @@ https://wuyin.io/2018/05/10/microservices-part-1-introduction-and-consignment-se
 
 https://ewanvalentine.io/microservices-in-golang-part-2/  
 ## 分支v2  
-  标签v2-1  
-    使用go-micro替代rpc, 使用docker  
+  标签v2-1：使用go-micro替代rpc, 使用docker  
+  
   修改记录  
     无法生成micro版的proto  
       解决：  
@@ -23,9 +23,10 @@ https://ewanvalentine.io/microservices-in-golang-part-2/
       在service目录：sudo make build && sudo make run  
       cli目录同理  
    
-  标签v2-2 (未测试成功，待研究 其他参考：https://medium.com/@pliutau/docker-and-go-modules-4265894f9fc)  
-    使用 Multi-stage builds 功能： 一个Dockerfile建两个images,  
-      一个image通过依赖构建二进制文件, 一个image用来run  
-    移除Makefile中的go build  
-  标签v2-3  
-    添加货船服务  
+## 下一版本
+  https://github.com/kyronbao/shippy-service-consignment
+  https://github.com/kyronbao/shippy-cli-consignment
+  
+
+
+
