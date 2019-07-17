@@ -5,9 +5,9 @@ https://wuyin.io/2018/05/10/microservices-part-1-introduction-and-consignment-se
 
 https://ewanvalentine.io/microservices-in-golang-part-2/  
 ## 分支v2  
-  标签v2-1：使用go-micro替代rpc, 使用docker  
+  使用go-micro替代rpc, 使用docker  
   
-  修改记录  
+  和源教程对比的修改记录  
   
     无法生成micro版的proto  
       解决：  
