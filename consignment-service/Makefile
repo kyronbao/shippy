@@ -3,7 +3,8 @@ build:
 # protoc 命令前边是一个 Tab，不是四个空格
 	protoc --proto_path=. --micro_out=. --go_out=. proto/consignment/consignment.proto
 	# 告知 Go 编译器生成二进制文件的目标环境：amd64 CPU 的 Linux 系统
-	GOPROXY=https://goproxy.io GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -a -installsuffix cgo -o  .
+	GOPROXY=https://goproxy.io GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o consignment-service -a -installsuffix \
+	  cgo main.go repository.go handler.go datastore.go
 	# 根据当前目录下的 Dockerfile 生成名为 consignment-service 的镜像
 	docker build -t consignment-service .
 run:

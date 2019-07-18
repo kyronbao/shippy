@@ -4,6 +4,6 @@ RUN mkdir /app
 
 WORKDIR /app
 
-ADD vessel-service /appvessel-service/
+ADD vessel-service /app/vessel-service
 
 CMD ["./vessel-service"]
