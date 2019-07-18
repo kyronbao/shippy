@@ -1,69 +1,105 @@
-// consignment-service/main.go
 package main
 
 import (
+	"context"
 	"fmt"
+	"log"
+
 	pb "github.com/kyronbao/shippy/consignment-service/proto/consignment"
-	// 使用 go-mircro
-	micro "github.com/micro/go-micro"
-	"golang.org/x/net/context"
+	vesselProto "github.com/kyronbao/shippy/vessel-service/proto/vessel"
+	"github.com/micro/go-micro"
 )
 
-type IRepository interface {
+type Repository interface {
 	Create(*pb.Consignment) (*pb.Consignment, error)
 	GetAll() []*pb.Consignment
 }
 
-// Repository - 模拟一个数据库，我们会在此后使用真正的数据库替代他
-type Repository struct {
+// Repository - Dummy repository, this simulates the use of a datastore
+// of some kind. We'll replace this with a real implementation later on.
+type ConsignmentRepository struct {
 	consignments []*pb.Consignment
 }
 
-func (repo *Repository) Create(consignment *pb.Consignment) (*pb.Consignment, error) {
+func (repo *ConsignmentRepository) Create(consignment *pb.Consignment) (*pb.Consignment, error) {
 	updated := append(repo.consignments, consignment)
 	repo.consignments = updated
 	return consignment, nil
 }
-func (repo *Repository) GetAll() []*pb.Consignment {
+
+func (repo *ConsignmentRepository) GetAll() []*pb.Consignment {
 	return repo.consignments
 }
 
-// service要实现在proto中定义的所有方法。当你不确定时
-// 可以去对应的*.pb.go文件里查看需要实现的方法及其定义
+// Service should implement all of the methods to satisfy the service
+// we defined in our protobuf definition. You can check the interface
+// in the generated code itself for the exact method signatures etc
+// to give you a better idea.
 type service struct {
-	repo IRepository
+	repo         Repository
+	vesselClient vesselProto.VesselService
 }
 
-// CreateConsignment - 在proto中，我们只给这个微服务定一个了一个方法
-// 就是这个CreateConsignment方法，它接受一个context以及proto中定义的
-// Consignment消息，这个Consignment是由gRPC的服务器处理后提供给你的
+// CreateConsignment - we created just one method on our service,
+// which is a create method, which takes a context and a request as an
+// argument, these are handled by the gRPC server.
 func (s *service) CreateConsignment(ctx context.Context, req *pb.Consignment, res *pb.Response) error {
+
+	// Here we call a client instance of our vessel service with our consignment weight,
+	// and the amount of containers as the capacity value
+	vesselResponse, err := s.vesselClient.FindAvailable(context.Background(), &vesselProto.Specification{
+		MaxWeight: req.Weight,
+		Capacity:  int32(len(req.Containers)),
+	})
+	if err != nil {
+		return err
+	}
+
+	log.Printf("Found vessel: %s \n", vesselResponse.Vessel.Name)
+
+	// We set the VesselId as the vessel we got back from our
+	// vessel service
+	req.VesselId = vesselResponse.Vessel.Id
+
+	// Save our consignment
 	consignment, err := s.repo.Create(req)
 	if err != nil {
 		return err
 	}
+
+	// Return matching the `Response` message we created in our
+	// protobuf definition.
 	res.Created = true
 	res.Consignment = consignment
 	return nil
 }
+
 func (s *service) GetConsignments(ctx context.Context, req *pb.GetRequest, res *pb.Response) error {
 	consignments := s.repo.GetAll()
 	res.Consignments = consignments
 	return nil
 }
+
 func main() {
-	repo := &Repository{}
-	// 注意，在这里我们使用go-micro的NewService方法来创建新的微服务服务器，
-	// 而不是上一篇文章中所用的标准
+
+	repo := &ConsignmentRepository{}
+
+	// Create a new service. Optionally include some options here.
 	srv := micro.NewService(
 		// This name must match the package name given in your protobuf definition
-		// 注意，Name方法的必须是你在proto文件中定义的package名字
 		micro.Name("go.micro.srv.consignment"),
 		micro.Version("latest"),
 	)
-	// Init方法会解析命令行flags
+
+	vesselClient := vesselProto.NewVesselService("go.micro.srv.vessel", srv.Client())
+
+	// Init will parse the command line flags.
 	srv.Init()
-	pb.RegisterShippingServiceHandler(srv.Server(), &service{repo})
+
+	// Register handler
+	pb.RegisterShippingServiceHandler(srv.Server(), &service{repo, vesselClient})
+
+	// Run the server
 	if err := srv.Run(); err != nil {
 		fmt.Println(err)
 	}

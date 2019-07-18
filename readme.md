@@ -5,7 +5,7 @@ https://wuyin.io/2018/05/10/microservices-part-1-introduction-and-consignment-se
 
 https://ewanvalentine.io/microservices-in-golang-part-2/  
 ## 分支v2  
-  使用go-micro替代rpc, 使用docker  
+### 标签v2-2: 使用go-micro替代rpc, 使用docker  
   
   和源教程对比的修改记录  
   
@@ -26,10 +26,13 @@ https://ewanvalentine.io/microservices-in-golang-part-2/
    
       在service目录：sudo make build && sudo make run  
       cli目录同理  
-   
-## 下一版本
-  - https://github.com/kyronbao/shippy-service-consignment
-  - https://github.com/kyronbao/shippy-cli-consignment
+
+### 标签v2-3  :添加vessel服务
+  判断vessel轮船是否有可用的，然后来发货  
+    （测试：调整consignment.json的weight大于200000，可以发现无法发货）  
+  在独立的容器部署可以参考  
+    - https://github.com/kyronbao/shippy-service-consignment  
+    - https://github.com/kyronbao/shippy-cli-consignment  
   
 
 
