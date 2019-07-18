@@ -27,12 +27,13 @@ https://ewanvalentine.io/microservices-in-golang-part-2/
       在service目录：sudo make build && sudo make run  
       cli目录同理  
 
-### 标签v2-3  :添加vessel服务
-  判断vessel轮船是否有可用的，然后来发货  
-    （测试：调整consignment.json的weight大于200000，可以发现无法发货）  
   在独立的容器部署可以参考  
     - https://github.com/kyronbao/shippy-service-consignment  
     - https://github.com/kyronbao/shippy-cli-consignment  
+    
+### 标签v2-3  :添加vessel服务
+  判断vessel轮船是否有可用的，然后来发货  
+    （测试：调整consignment.json的weight大于200000，可以发现无法发货）  
   
 
 
