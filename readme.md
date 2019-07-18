@@ -39,7 +39,7 @@ https://ewanvalentine.io/microservices-in-golang-part-2/
   调试记录  
       stat ./vessel-service: no such file or directory    
   原因：  
-    本地运行go build后生成的vessel-service文件无法运行，需要运行sudo make build (参考里面的命令)  
+    本地运行go build后生成的vessel-service文件无法运行，需要运行sudo make build (参考Makefile里面go build的命令)  
     当docker-compose up 后创建的container会缓存  
   解决：  
     删除vessel相关的imges  
